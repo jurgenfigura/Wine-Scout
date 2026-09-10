@@ -68,6 +68,7 @@ export default function App() {
   const [isRedWine, setIsRedWine] = useState(null); // null | true | false
   const [status, setStatus] = useState("idle"); // idle | analyzing | done | error
   const [showOriginal, setShowOriginal] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const [copied, setCopied] = useState(false);
   const [clipboardText, setClipboardText] = useState("");
   const fileInputRef = useRef(null);
@@ -369,6 +370,13 @@ export default function App() {
                 <span style={styles.navTitle}>Wine Scout</span>
                 <span style={styles.navSubtitle}>Your personal sommelier</span>
               </div>
+              <button
+                style={styles.infoButton}
+                onClick={() => setShowInfo(true)}
+                title="About Wine Scout"
+              >
+                i
+              </button>
             </div>
           </div>
           <div style={styles.navRule} />
@@ -524,12 +532,14 @@ export default function App() {
               onClick={handleOpenWineEnthusiast}
             >
               🍷 Wine Enthusiast
+              <span style={styles.buttonSubtext}>(free)</span>
             </button>
             <button
               style={styles.enthusiastButton}
               onClick={handleOpenWineSpectator}
             >
               🍷 Wine Spectator
+              <span style={styles.buttonSubtext}>(subscription)</span>
             </button>
           </div>
         </div>
@@ -547,6 +557,28 @@ export default function App() {
               style={styles.originalOverlayImg}
             />
             <span style={styles.originalOverlayCaption}>Original photo</span>
+          </div>
+        )}
+
+        {showInfo && (
+          <div style={styles.infoOverlay}>
+            <div style={styles.infoCard}>
+              <span style={styles.infoTitle}>About Wine Scout</span>
+              <p style={styles.infoBody}>
+                Developed by Jurgen as a Claude AI learning exercise over a
+                few hours, guided by MS Co-Pilot. The app should be
+                self-explanatory. If it stops reading labels, we've probably
+                spent all the money I was willing to put out for the Claude
+                API (charged per scan). If you found this useful, please
+                consider a donation towards more API funding.
+              </p>
+              <button
+                style={styles.infoCloseButton}
+                onClick={() => setShowInfo(false)}
+              >
+                Got it
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -628,6 +660,24 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: 12,
+  },
+  infoButton: {
+    marginLeft: "auto",
+    width: 30,
+    height: 30,
+    borderRadius: "50%",
+    background: "rgba(243,217,164,0.16)",
+    border: "1px solid rgba(243,217,164,0.55)",
+    color: "#F3D9A4",
+    fontFamily: SERIF,
+    fontWeight: 700,
+    fontSize: 15,
+    lineHeight: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    flexShrink: 0,
   },
   brandBadge: {
     width: 40,
@@ -910,7 +960,7 @@ const styles = {
     background: "#FFFDF8",
     border: "1.5px solid #D9A93F",
     borderRadius: 16,
-    padding: "14px 8px",
+    padding: "12px 8px 10px",
     fontFamily: SERIF,
     fontSize: 13.5,
     fontWeight: 700,
@@ -918,6 +968,17 @@ const styles = {
     letterSpacing: 0.2,
     cursor: "pointer",
     boxShadow: "0 2px 8px rgba(74,16,32,0.06)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 2,
+  },
+  buttonSubtext: {
+    fontFamily: SANS,
+    fontSize: 9,
+    fontWeight: 600,
+    color: "#B8862A",
+    letterSpacing: 0.2,
   },
   originalOverlay: {
     position: "absolute",
@@ -944,6 +1005,53 @@ const styles = {
     fontWeight: 700,
     color: "#F3D9A4",
     letterSpacing: 0.3,
+  },
+  infoOverlay: {
+    position: "absolute",
+    inset: 0,
+    background: "rgba(20,8,10,0.85)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 28,
+    zIndex: 30,
+  },
+  infoCard: {
+    background: "#FBF5E9",
+    borderRadius: 20,
+    padding: "26px 22px 22px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 14,
+    boxShadow: "0 0 0 1px #D9A93F, 0 16px 34px rgba(0,0,0,0.5)",
+    maxWidth: 300,
+  },
+  infoTitle: {
+    fontFamily: SERIF,
+    fontSize: 18,
+    fontWeight: 700,
+    color: "#4A1020",
+  },
+  infoBody: {
+    fontSize: 13.5,
+    lineHeight: 1.5,
+    color: "#3B2A20",
+    textAlign: "center",
+    margin: 0,
+  },
+  infoCloseButton: {
+    marginTop: 4,
+    background: "linear-gradient(135deg, #E8C877 0%, #D9A93F 45%, #B8862A 100%)",
+    border: "none",
+    borderRadius: 12,
+    padding: "9px 22px",
+    fontFamily: "inherit",
+    fontSize: 13.5,
+    fontWeight: 700,
+    color: "#3B0F1F",
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(184,134,42,0.3)",
   },
   homeIndicatorWrap: {
     display: "flex",

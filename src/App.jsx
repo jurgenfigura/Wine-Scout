@@ -31,32 +31,101 @@ function WineGlassIcon({ size = 26, color = "#F3D9A4", strokeWidth = 1.6 }) {
   );
 }
 
-function CautionTriangleIcon({ size = 40 }) {
+function BottleLineupIcon({ size = 26, color = "#F3D9A4" }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 40 40"
+      viewBox="0 0 24 24"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
+      {/* wine bottle: tall, slim, long neck */}
+      <rect x="3.1" y="1.6" width="1.8" height="1.3" rx="0.4" fill={color} />
+      <rect x="3.3" y="2.7" width="1.4" height="5.6" rx="0.3" fill={color} />
       <path
-        d="M20 4L37 34H3L20 4Z"
-        fill="#F4C430"
-        stroke="#8A6300"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
+        d="M2.6 8.3 Q2.6 7.3 3.4 7.3 L4.6 7.3 Q5.4 7.3 5.4 8.3 L5.4 20.8 Q5.4 21.6 4.6 21.6 L3.4 21.6 Q2.6 21.6 2.6 20.8 Z"
+        fill={color}
       />
-      <rect x="18.4" y="15" width="3.2" height="10" rx="1.2" fill="#3B2A0E" />
-      <circle cx="20" cy="29" r="1.8" fill="#3B2A0E" />
+      {/* whisky bottle: short, squat, wide shoulders */}
+      <rect x="9.3" y="4" width="2.2" height="1.2" rx="0.4" fill={color} />
+      <rect x="9.5" y="5.1" width="1.8" height="2.7" rx="0.3" fill={color} />
+      <path
+        d="M8.3 8.3 Q8.3 7.4 9.2 7.4 L12.1 7.4 Q13 7.4 13 8.3 L13 20.8 Q13 21.6 12.1 21.6 L9.2 21.6 Q8.3 21.6 8.3 20.8 Z"
+        fill={color}
+      />
+      {/* beer bottle: medium, curved shoulder, tapered neck */}
+      <rect x="16.2" y="1" width="1.8" height="1.2" rx="0.4" fill={color} />
+      <rect x="16.4" y="2.1" width="1.4" height="4.4" rx="0.3" fill={color} />
+      <path
+        d="M15.4 8.4 Q15.4 6.9 16.4 6.6 L17.6 6.6 Q18.6 6.9 18.6 8.4 L18.6 20.8 Q18.6 21.6 17.8 21.6 L16.2 21.6 Q15.4 21.6 15.4 20.8 Z"
+        fill={color}
+      />
     </svg>
   );
 }
 
-const BLANK_WINE = {
-  winery: "",
-  wineName: "",
-  vintage: "",
-  varietal: "",
+function ConciergeIcon({ size = 22, color = "#F3D9A4" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* lens */}
+      <circle
+        cx="10"
+        cy="10"
+        r="9"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+      />
+      {/* handle */}
+      <line
+        x1="16.4"
+        y1="16.4"
+        x2="23"
+        y2="23"
+        stroke={color}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+      />
+      {/* a bottle, seen through the lens */}
+      <rect x="9.1" y="2.2" width="1.8" height="1.3" rx="0.35" fill={color} />
+      <rect x="9.3" y="3.5" width="1.4" height="2.3" rx="0.3" fill={color} />
+      <path
+        d="M7.8 6.3 Q7.8 5.3 8.8 5.3 L11.2 5.3 Q12.2 5.3 12.2 6.3 L12.2 14.8 Q12.2 15.8 11.2 15.8 L8.8 15.8 Q7.8 15.8 7.8 14.8 Z"
+        fill={color}
+      />
+    </svg>
+  );
+}
+
+function GoogleIcon({ size = 16 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M12 12 L4.2 7.5 A9 9 0 0 1 19.8 7.5 Z" fill="#EA4335" />
+      <path d="M12 12 L19.8 7.5 A9 9 0 0 1 12 21 Z" fill="#FBBC05" />
+      <path d="M12 12 L12 21 A9 9 0 0 1 4.2 7.5 Z" fill="#34A853" />
+      <circle cx="12" cy="12" r="5.5" fill="#FFFFFF" />
+      <circle cx="12" cy="12" r="4" fill="#4285F4" />
+    </svg>
+  );
+}
+
+const BLANK_ITEM = {
+  brand: "",
+  product: "",
+  type: "",
+  year: "",
   region: "",
   country: "",
 };
@@ -64,15 +133,14 @@ const BLANK_WINE = {
 export default function App() {
   const [image, setImage] = useState(null);
   const [labelThumb, setLabelThumb] = useState(null);
-  const [wineData, setWineData] = useState(BLANK_WINE);
-  const [isRedWine, setIsRedWine] = useState(null); // null | true | false
+  const [itemData, setItemData] = useState(BLANK_ITEM);
+  const [category, setCategory] = useState(""); // "wine" | "whisky" | "beer" | "cider" | "spirit" | "unknown" | ""
   const [status, setStatus] = useState("idle"); // idle | analyzing | done | error
   const [showOriginal, setShowOriginal] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [copied, setCopied] = useState(false);
   const [clipboardText, setClipboardText] = useState("");
   const fileInputRef = useRef(null);
-  const originalTimeoutRef = useRef(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files && e.target.files[0];
@@ -82,8 +150,8 @@ export default function App() {
       const dataUrl = ev.target.result;
       setImage(dataUrl);
       setLabelThumb(null);
-      setWineData(BLANK_WINE);
-      setIsRedWine(null);
+      setItemData(BLANK_ITEM);
+      setCategory("");
       setCopied(false);
       setClipboardText("");
       analyzeLabel(dataUrl);
@@ -94,13 +162,12 @@ export default function App() {
   const handleRemove = () => {
     setImage(null);
     setLabelThumb(null);
-    setWineData(BLANK_WINE);
-    setIsRedWine(null);
+    setItemData(BLANK_ITEM);
+    setCategory("");
     setStatus("idle");
     setShowOriginal(false);
     setCopied(false);
     setClipboardText("");
-    clearTimeout(originalTimeoutRef.current);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -115,13 +182,43 @@ export default function App() {
 
   const handleShowOriginal = () => {
     setShowOriginal(true);
-    clearTimeout(originalTimeoutRef.current);
-    originalTimeoutRef.current = setTimeout(() => {
-      setShowOriginal(false);
-    }, 5000);
+  };
+
+  const handleCloseOriginal = () => {
+    setShowOriginal(false);
+  };
+
+  const handleOpenGoogleSearch = () => {
+    const query = [
+      itemData.brand,
+      itemData.product,
+      itemData.type,
+      itemData.year,
+      itemData.region,
+      itemData.country,
+    ]
+      .filter((v) => v && v.toLowerCase() !== "unknown")
+      .join(" ");
+    const url = query
+      ? `https://www.google.com/search?q=${encodeURIComponent(query)}`
+      : "https://www.google.com/";
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  // Re-copies the current item's details to the clipboard, called
+  // synchronously from a click handler so it runs inside a genuine user
+  // gesture rather than deep in an async chain - this is the moment
+  // browsers most reliably allow a clipboard write.
+  const copyBeforeLinkOpen = () => {
+    if (clipboardText && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(clipboardText).catch((err) => {
+        console.error("Clipboard copy on link-open failed:", err);
+      });
+    }
   };
 
   const handleOpenWineEnthusiast = () => {
+    copyBeforeLinkOpen();
     window.open(
       "https://www.wineenthusiast.com/ratings/",
       "_blank",
@@ -130,8 +227,27 @@ export default function App() {
   };
 
   const handleOpenWineSpectator = () => {
+    copyBeforeLinkOpen();
     window.open(
       "https://www.winespectator.com/ratings/",
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+  const handleOpenWhiskyAdvocate = () => {
+    copyBeforeLinkOpen();
+    window.open(
+      "https://www.whiskyadvocate.com/ratings-reviews",
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+  const handleOpenWineEnthusiastSpirits = () => {
+    copyBeforeLinkOpen();
+    window.open(
+      "https://www.wineenthusiast.com/ratings/spirits/",
       "_blank",
       "noopener,noreferrer"
     );
@@ -193,22 +309,37 @@ export default function App() {
       const cleaned = textBlock.text.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(cleaned);
 
-      const finalWinery = parsed.winery || "unknown";
-      const finalWineName = parsed.wineName || "unknown";
-      const finalVintage = parsed.vintageYear || "unknown";
+      const finalBrand = parsed.brand || "unknown";
+      const finalProduct = parsed.product || "unknown";
+      const finalYear = parsed.year || "unknown";
+      const finalType = parsed.type || "unknown";
+      const finalRegion = parsed.region || "unknown";
+      const finalCountry = parsed.country || "unknown";
 
-      setWineData({
-        winery: finalWinery,
-        wineName: finalWineName,
-        vintage: finalVintage,
-        varietal: parsed.varietal || "unknown",
-        region: parsed.region || "unknown",
-        country: parsed.country || "unknown",
+      const allowedCategories = [
+        "wine",
+        "whisky",
+        "beer",
+        "cider",
+        "spirit",
+        "unknown",
+      ];
+      const rawCategory =
+        typeof parsed.category === "string"
+          ? parsed.category.toLowerCase().trim()
+          : "unknown";
+      setCategory(
+        allowedCategories.includes(rawCategory) ? rawCategory : "unknown"
+      );
+
+      setItemData({
+        brand: finalBrand,
+        product: finalProduct,
+        type: finalType,
+        year: finalYear,
+        region: finalRegion,
+        country: finalCountry,
       });
-      const redWineFlag =
-        parsed.isRedWine === false ||
-        String(parsed.isRedWine).toLowerCase() === "false";
-      setIsRedWine(!redWineFlag);
 
       if (
         parsed.labelBoundingBox &&
@@ -225,7 +356,7 @@ export default function App() {
         }
       }
 
-      const newClipboardText = [finalWinery, finalWineName, finalVintage]
+      const newClipboardText = [finalBrand, finalProduct, finalYear]
         .filter((v) => v && v.toLowerCase() !== "unknown")
         .join("\n");
 
@@ -253,7 +384,7 @@ export default function App() {
 
       setStatus("done");
     } catch (err) {
-      console.error("Wine label analysis error:", err);
+      console.error("Label analysis error:", err);
       setStatus("error");
     }
   };
@@ -266,50 +397,50 @@ export default function App() {
   });
 
   const fields = [
-    { label: "Winery", key: "winery" },
-    { label: "Wine name", key: "wineName" },
-    { label: "Vintage year", key: "vintage" },
-    { label: "Grape varietal(s)", key: "varietal" },
+    { label: "Brand", key: "brand" },
+    { label: "Product", key: "product" },
+    { label: "Type", key: "type" },
+    { label: "Year", key: "year" },
     { label: "Region", key: "region" },
     { label: "Country", key: "country" },
   ];
 
-  const rejected = status === "done" && isRedWine === false;
-  const isPinotNoir =
-    status === "done" &&
-    !rejected &&
-    typeof wineData.varietal === "string" &&
-    wineData.varietal.toLowerCase().includes("pinot noir");
+  const visibleFields =
+    status === "done"
+      ? fields.filter((f) => {
+          const v = itemData[f.key];
+          return v && v.toLowerCase() !== "unknown";
+        })
+      : fields;
 
-  const sheetSubtitle = rejected
-    ? "Not a red wine"
-    : status === "analyzing"
-    ? "Reading the label…"
-    : status === "done"
-    ? "Identified from your photo"
-    : status === "error"
-    ? "Couldn't read the label"
-    : "Not yet identified";
+  const sheetSubtitle =
+    status === "analyzing"
+      ? "Reading the label…"
+      : status === "done"
+      ? "Identified from your photo"
+      : status === "error"
+      ? "Couldn't read the label"
+      : "Not yet identified";
 
   return (
     <div style={styles.page}>
       <style>{`
-        .wine-scout-sheet {
+        .proof-sheet {
           scrollbar-width: thin;
           scrollbar-color: #D9A93F #F0E4C8;
         }
-        .wine-scout-sheet::-webkit-scrollbar {
+        .proof-sheet::-webkit-scrollbar {
           width: 7px;
         }
-        .wine-scout-sheet::-webkit-scrollbar-track {
+        .proof-sheet::-webkit-scrollbar-track {
           background: #F0E4C8;
           border-radius: 8px;
         }
-        .wine-scout-sheet::-webkit-scrollbar-thumb {
+        .proof-sheet::-webkit-scrollbar-thumb {
           background: linear-gradient(180deg, #E8C877 0%, #B8862A 100%);
           border-radius: 8px;
         }
-        .wine-scout-sheet::-webkit-scrollbar-thumb:hover {
+        .proof-sheet::-webkit-scrollbar-thumb:hover {
           background: #B8862A;
         }
       `}</style>
@@ -364,16 +495,16 @@ export default function App() {
           <div style={styles.navBar}>
             <div style={styles.brandRow}>
               <div style={styles.brandBadge}>
-                <WineGlassIcon size={20} color="#3B0F1F" strokeWidth={1.7} />
+                <ConciergeIcon size={30} color="#3B0F1F" />
               </div>
               <div style={styles.brandTextWrap}>
-                <span style={styles.navTitle}>Wine Scout</span>
-                <span style={styles.navSubtitle}>Your personal sommelier</span>
+                <span style={styles.navTitle}>Proof!</span>
+                <span style={styles.navSubtitle}>Your Liquor Store Concierge</span>
               </div>
               <button
                 style={styles.infoButton}
                 onClick={() => setShowInfo(true)}
-                title="About Wine Scout"
+                title="About Proof!"
               >
                 i
               </button>
@@ -390,9 +521,9 @@ export default function App() {
               onClick={() => fileInputRef.current.click()}
             >
               <div style={styles.uploadGlyph}>
-                <WineGlassIcon size={22} color="#C9962E" strokeWidth={1.5} />
+                <BottleLineupIcon size={27} color="#C9962E" />
               </div>
-              <span style={styles.uploadTitle}>Add a bottle</span>
+              <span style={styles.uploadTitle}>Investigate a bottle</span>
               <span style={styles.uploadHint}>
                 Snap a photo of the label to start
               </span>
@@ -409,7 +540,7 @@ export default function App() {
                   >
                     <img
                       src={labelThumb || image}
-                      alt="Wine label"
+                      alt="Product label"
                       style={styles.photo}
                     />
                   </button>
@@ -419,41 +550,34 @@ export default function App() {
                 <div style={styles.photoThumb}>
                   <img
                     src={labelThumb || image}
-                    alt="Wine label"
+                    alt="Product label"
                     style={styles.photo}
                   />
                 </div>
               )}
               <div style={styles.photoRowText}>
-                <span style={styles.photoRowLabel}>Wine label</span>
+                <span style={styles.photoRowLabel}>Label</span>
                 <button style={styles.retakeLink} onClick={handleRemove}>
                   Retake
                 </button>
               </div>
-              {isPinotNoir ? (
-                <div style={styles.potatoWrap} title="Pinot noir">
-                  <CautionTriangleIcon size={36} />
-                  <span style={styles.potatoCaption}>Spud? is that you?</span>
-                </div>
-              ) : (
-                <button
-                  style={{
-                    ...styles.analyzeButtonSmall,
-                    opacity: status === "analyzing" ? 0.6 : 1,
-                    cursor: status === "analyzing" ? "default" : "pointer",
-                  }}
-                  disabled={status === "analyzing"}
-                  onClick={() => analyzeLabel(image)}
-                >
-                  {status === "analyzing"
-                    ? "Analyzing…"
-                    : status === "error"
-                    ? "Try again"
-                    : status === "done"
-                    ? "Re-analyze"
-                    : "Identify"}
-                </button>
-              )}
+              <button
+                style={{
+                  ...styles.analyzeButtonSmall,
+                  opacity: status === "analyzing" ? 0.6 : 1,
+                  cursor: status === "analyzing" ? "default" : "pointer",
+                }}
+                disabled={status === "analyzing"}
+                onClick={() => analyzeLabel(image)}
+              >
+                {status === "analyzing"
+                  ? "Analyzing…"
+                  : status === "error"
+                  ? "Try again"
+                  : status === "done"
+                  ? "Re-analyze"
+                  : "Identify"}
+              </button>
             </div>
           )}
 
@@ -467,7 +591,7 @@ export default function App() {
           />
 
           {/* Field list */}
-          <div className="wine-scout-sheet" style={styles.sheet}>
+          <div className="proof-sheet" style={styles.sheet}>
             <div style={styles.sheetHeaderRow}>
               <div style={styles.sheetHeaderLeft}>
                 <span
@@ -481,16 +605,15 @@ export default function App() {
               </div>
               <div style={styles.sheetHeaderRule} />
             </div>
-            {rejected ? (
-              <div style={styles.rejectBlock}>
-                <span style={styles.rejectFace} role="img" aria-label="Yuck">
-                  🤢
+            {status === "done" && visibleFields.length === 0 ? (
+              <div style={styles.noFieldsBlock}>
+                <span style={styles.noFieldsText}>
+                  No label details could be identified
                 </span>
-                <span style={styles.rejectText}>No thanks</span>
               </div>
             ) : (
-              fields.map((f, i) => {
-                const value = wineData[f.key];
+              visibleFields.map((f, i) => {
+                const value = itemData[f.key];
                 const isKnown = value && value.toLowerCase() !== "unknown";
                 return (
                   <div
@@ -522,25 +645,58 @@ export default function App() {
 
           {copied && (
             <button style={styles.copiedNotice} onClick={handleCopyAgain}>
-              wine details copied to clipboard for pasting...
+              details copied to clipboard for pasting...
             </button>
           )}
 
           <div style={styles.bottomButtonRow}>
             <button
               style={styles.enthusiastButton}
-              onClick={handleOpenWineEnthusiast}
+              onClick={handleOpenGoogleSearch}
             >
-              🍷 Wine Enthusiast
-              <span style={styles.buttonSubtext}>(free)</span>
+              <GoogleIcon size={20} />
+              <span style={styles.buttonLabelText}>Look it up</span>
             </button>
-            <button
-              style={styles.enthusiastButton}
-              onClick={handleOpenWineSpectator}
-            >
-              🍷 Wine Spectator
-              <span style={styles.buttonSubtext}>(subscription)</span>
-            </button>
+            {category === "wine" && (
+              <>
+                <button
+                  style={styles.enthusiastButton}
+                  onClick={handleOpenWineEnthusiast}
+                >
+                  <span style={styles.buttonIcon}>🍷</span>
+                  <span style={styles.buttonLabelText}>Wine Enthusiast</span>
+                  <span style={styles.buttonSubtext}>(free)</span>
+                </button>
+                <button
+                  style={styles.enthusiastButton}
+                  onClick={handleOpenWineSpectator}
+                >
+                  <span style={styles.buttonIcon}>🍷</span>
+                  <span style={styles.buttonLabelText}>Wine Spectator</span>
+                  <span style={styles.buttonSubtext}>(subscription)</span>
+                </button>
+              </>
+            )}
+            {(category === "whisky" || category === "spirit") && (
+              <>
+                <button
+                  style={styles.enthusiastButton}
+                  onClick={handleOpenWhiskyAdvocate}
+                >
+                  <span style={styles.buttonIcon}>🥃</span>
+                  <span style={styles.buttonLabelText}>Whisky Advocate</span>
+                </button>
+                <button
+                  style={styles.enthusiastButton}
+                  onClick={handleOpenWineEnthusiastSpirits}
+                >
+                  <span style={styles.buttonIcon}>🥃</span>
+                  <span style={styles.buttonLabelText}>
+                    Wine Enthusiast Spirits
+                  </span>
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -557,20 +713,34 @@ export default function App() {
               style={styles.originalOverlayImg}
             />
             <span style={styles.originalOverlayCaption}>Original photo</span>
+            <button
+              style={styles.originalCloseButton}
+              onClick={handleCloseOriginal}
+            >
+              Close
+            </button>
           </div>
         )}
 
         {showInfo && (
           <div style={styles.infoOverlay}>
             <div style={styles.infoCard}>
-              <span style={styles.infoTitle}>About Wine Scout</span>
+              <span style={styles.infoTitle}>About Proof!</span>
               <p style={styles.infoBody}>
-                Developed by Jurgen as a Claude AI learning exercise over a
-                few hours, guided by MS Co-Pilot. The app should be
-                self-explanatory. If it stops reading labels, we've probably
-                spent all the money I was willing to put out for the Claude
-                API (charged per scan). If you found this useful, please
-                consider a donation towards more API funding.
+                I created this helper app to more quickly browse and research
+                wine and spirits while I'm in the store. I don't know about
+                you, but I find it hard to accurately spell most Italian
+                labels and often got no results. I'm hoping this makes your
+                life easier.
+                <br />
+                <br />
+                If you find this useful please consider a donation towards
+                funding the Claude API that I pay for.
+                <br />
+                <br />
+                Happy Hunting!
+                <br />
+                - Jurgen
               </p>
               <button
                 style={styles.infoCloseButton}
@@ -586,7 +756,8 @@ export default function App() {
   );
 }
 
-const SERIF = "'Playfair Display', Georgia, 'Times New Roman', serif";
+const SERIF =
+  "'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif";
 const SANS =
   "'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif";
 
@@ -787,22 +958,6 @@ const styles = {
     boxShadow: "0 4px 10px rgba(184,134,42,0.3)",
     flexShrink: 0,
   },
-  potatoWrap: {
-    marginLeft: "auto",
-    flexShrink: 0,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2,
-  },
-  potatoCaption: {
-    fontSize: 10,
-    fontWeight: 700,
-    color: "#8A6300",
-    textAlign: "center",
-    whiteSpace: "nowrap",
-  },
   photoThumb: {
     width: 68,
     height: 68,
@@ -898,22 +1053,16 @@ const styles = {
     height: 1,
     background: "linear-gradient(90deg, #D9A93F 0%, rgba(217,169,63,0.15) 100%)",
   },
-  rejectBlock: {
+  noFieldsBlock: {
+    padding: "20px 20px 32px",
     display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 8,
-    padding: "30px 20px 38px",
+    justifyContent: "center",
   },
-  rejectFace: {
-    fontSize: 44,
-    lineHeight: 1,
-  },
-  rejectText: {
-    fontFamily: SERIF,
-    fontSize: 19,
-    fontWeight: 700,
-    color: "#4A1020",
+  noFieldsText: {
+    fontSize: 13.5,
+    color: "#8C7A5A",
+    fontStyle: "italic",
+    textAlign: "center",
   },
   fieldRow: {
     display: "flex",
@@ -953,10 +1102,12 @@ const styles = {
   },
   bottomButtonRow: {
     display: "flex",
+    flexWrap: "wrap",
     gap: 10,
   },
   enthusiastButton: {
-    flex: 1,
+    flex: "1 1 30%",
+    minWidth: 100,
     background: "#FFFDF8",
     border: "1.5px solid #D9A93F",
     borderRadius: 16,
@@ -972,6 +1123,13 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     gap: 2,
+  },
+  buttonIcon: {
+    fontSize: 19,
+    lineHeight: 1,
+  },
+  buttonLabelText: {
+    textAlign: "center",
   },
   buttonSubtext: {
     fontFamily: SANS,
@@ -1005,6 +1163,19 @@ const styles = {
     fontWeight: 700,
     color: "#F3D9A4",
     letterSpacing: 0.3,
+  },
+  originalCloseButton: {
+    marginTop: 6,
+    background: "linear-gradient(135deg, #E8C877 0%, #D9A93F 45%, #B8862A 100%)",
+    border: "none",
+    borderRadius: 12,
+    padding: "9px 24px",
+    fontFamily: "inherit",
+    fontSize: 13.5,
+    fontWeight: 700,
+    color: "#3B0F1F",
+    cursor: "pointer",
+    boxShadow: "0 4px 10px rgba(184,134,42,0.3)",
   },
   infoOverlay: {
     position: "absolute",

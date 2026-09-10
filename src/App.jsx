@@ -224,18 +224,8 @@ export default function App() {
         }
       }
 
-      const newClipboardText = [
-        finalWinery.toLowerCase() !== "unknown"
-          ? `Winery: ${finalWinery}`
-          : null,
-        finalWineName.toLowerCase() !== "unknown"
-          ? `Wine Name: ${finalWineName}`
-          : null,
-        finalVintage.toLowerCase() !== "unknown"
-          ? `Vintage: ${finalVintage}`
-          : null,
-      ]
-        .filter(Boolean)
+      const newClipboardText = [finalWinery, finalWineName, finalVintage]
+        .filter((v) => v && v.toLowerCase() !== "unknown")
         .join("\n");
 
       if (newClipboardText) {

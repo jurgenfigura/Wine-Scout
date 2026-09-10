@@ -63,10 +63,15 @@ const BLANK_WINE = {
 
 export default function App() {
   const [image, setImage] = useState(null);
+  const [labelThumb, setLabelThumb] = useState(null);
   const [wineData, setWineData] = useState(BLANK_WINE);
   const [isRedWine, setIsRedWine] = useState(null); // null | true | false
   const [status, setStatus] = useState("idle"); // idle | analyzing | done | error
+  const [showOriginal, setShowOriginal] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [clipboardText, setClipboardText] = useState("");
   const fileInputRef = useRef(null);
+  const originalTimeoutRef = useRef(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files && e.target.files[0];
@@ -75,8 +80,11 @@ export default function App() {
     reader.onload = (ev) => {
       const dataUrl = ev.target.result;
       setImage(dataUrl);
+      setLabelThumb(null);
       setWineData(BLANK_WINE);
       setIsRedWine(null);
+      setCopied(false);
+      setClipboardText("");
       analyzeLabel(dataUrl);
     };
     reader.readAsDataURL(file);
@@ -84,11 +92,81 @@ export default function App() {
 
   const handleRemove = () => {
     setImage(null);
+    setLabelThumb(null);
     setWineData(BLANK_WINE);
     setIsRedWine(null);
     setStatus("idle");
+    setShowOriginal(false);
+    setCopied(false);
+    setClipboardText("");
+    clearTimeout(originalTimeoutRef.current);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
+  const handleCopyAgain = async () => {
+    if (!clipboardText) return;
+    try {
+      await navigator.clipboard.writeText(clipboardText);
+    } catch (err) {
+      console.error("Manual clipboard copy failed:", err);
+    }
+  };
+
+  const handleShowOriginal = () => {
+    setShowOriginal(true);
+    clearTimeout(originalTimeoutRef.current);
+    originalTimeoutRef.current = setTimeout(() => {
+      setShowOriginal(false);
+    }, 5000);
+  };
+
+  const handleOpenWineEnthusiast = () => {
+    window.open(
+      "https://www.wineenthusiast.com/ratings/",
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+  const handleOpenWineSpectator = () => {
+    window.open(
+      "https://www.winespectator.com/ratings/",
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+  // Crops the original photo down to a bounding box (fractions 0-1 of the
+  // image's width/height) using an offscreen canvas, and resolves with a
+  // cropped image as a data URL.
+  const cropToBoundingBox = (dataUrl, box) =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const x = Math.max(0, Math.min(1, box.x ?? 0));
+          const y = Math.max(0, Math.min(1, box.y ?? 0));
+          const w = Math.max(0.05, Math.min(1 - x, box.width ?? 1));
+          const h = Math.max(0.05, Math.min(1 - y, box.height ?? 1));
+
+          const sx = x * img.naturalWidth;
+          const sy = y * img.naturalHeight;
+          const sw = w * img.naturalWidth;
+          const sh = h * img.naturalHeight;
+
+          const canvas = document.createElement("canvas");
+          canvas.width = sw;
+          canvas.height = sh;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+          resolve(canvas.toDataURL("image/jpeg", 0.92));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
 
   const analyzeLabel = async (dataUrl) => {
     setStatus("analyzing");
@@ -114,10 +192,14 @@ export default function App() {
       const cleaned = textBlock.text.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(cleaned);
 
+      const finalWinery = parsed.winery || "unknown";
+      const finalWineName = parsed.wineName || "unknown";
+      const finalVintage = parsed.vintageYear || "unknown";
+
       setWineData({
-        winery: parsed.winery || "unknown",
-        wineName: parsed.wineName || "unknown",
-        vintage: parsed.vintageYear || "unknown",
+        winery: finalWinery,
+        wineName: finalWineName,
+        vintage: finalVintage,
         varietal: parsed.varietal || "unknown",
         region: parsed.region || "unknown",
         country: parsed.country || "unknown",
@@ -126,6 +208,58 @@ export default function App() {
         parsed.isRedWine === false ||
         String(parsed.isRedWine).toLowerCase() === "false";
       setIsRedWine(!redWineFlag);
+
+      if (
+        parsed.labelBoundingBox &&
+        typeof parsed.labelBoundingBox === "object"
+      ) {
+        try {
+          const cropped = await cropToBoundingBox(
+            dataUrl,
+            parsed.labelBoundingBox
+          );
+          setLabelThumb(cropped);
+        } catch (cropErr) {
+          console.error("Label crop error:", cropErr);
+        }
+      }
+
+      const newClipboardText = [
+        finalWinery.toLowerCase() !== "unknown"
+          ? `Winery: ${finalWinery}`
+          : null,
+        finalWineName.toLowerCase() !== "unknown"
+          ? `Wine Name: ${finalWineName}`
+          : null,
+        finalVintage.toLowerCase() !== "unknown"
+          ? `Vintage: ${finalVintage}`
+          : null,
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      if (newClipboardText) {
+        setClipboardText(newClipboardText);
+        setCopied(true);
+        // Best-effort automatic copy. Many browsers only allow clipboard
+        // writes that happen directly inside a click handler, so this can
+        // silently fail here since we're deep inside an async chain. The
+        // notice below is also a button - tapping it retries the copy
+        // from a genuine click, which is far more reliable.
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(newClipboardText);
+          } else {
+            throw new Error("Clipboard API unavailable");
+          }
+        } catch (clipErr) {
+          console.error(
+            "Automatic clipboard write failed (expected in some environments - tap the notice to copy manually):",
+            clipErr
+          );
+        }
+      }
+
       setStatus("done");
     } catch (err) {
       console.error("Wine label analysis error:", err);
@@ -258,7 +392,7 @@ export default function App() {
               onClick={() => fileInputRef.current.click()}
             >
               <div style={styles.uploadGlyph}>
-                <WineGlassIcon size={30} color="#C9962E" strokeWidth={1.5} />
+                <WineGlassIcon size={22} color="#C9962E" strokeWidth={1.5} />
               </div>
               <span style={styles.uploadTitle}>Add a bottle</span>
               <span style={styles.uploadHint}>
@@ -268,15 +402,32 @@ export default function App() {
             </button>
           ) : (
             <div style={styles.photoRow}>
-              <div style={styles.photoThumb}>
-                <img
-                  src={image}
-                  alt="Uploaded wine bottle"
-                  style={styles.photo}
-                />
-              </div>
+              {status === "done" ? (
+                <div style={styles.photoThumbCol}>
+                  <button
+                    style={styles.photoThumbButton}
+                    onClick={handleShowOriginal}
+                    title="Tap to view original photo"
+                  >
+                    <img
+                      src={labelThumb || image}
+                      alt="Wine label"
+                      style={styles.photo}
+                    />
+                  </button>
+                  <span style={styles.thumbCaption}>click for orig</span>
+                </div>
+              ) : (
+                <div style={styles.photoThumb}>
+                  <img
+                    src={labelThumb || image}
+                    alt="Wine label"
+                    style={styles.photo}
+                  />
+                </div>
+              )}
               <div style={styles.photoRowText}>
-                <span style={styles.photoRowLabel}>Bottle photo</span>
+                <span style={styles.photoRowLabel}>Wine label</span>
                 <button style={styles.retakeLink} onClick={handleRemove}>
                   Retake
                 </button>
@@ -370,12 +521,44 @@ export default function App() {
               })
             )}
           </div>
+
+          {copied && (
+            <button style={styles.copiedNotice} onClick={handleCopyAgain}>
+              wine details copied to clipboard for pasting...
+            </button>
+          )}
+
+          <div style={styles.bottomButtonRow}>
+            <button
+              style={styles.enthusiastButton}
+              onClick={handleOpenWineEnthusiast}
+            >
+              🍷 Wine Enthusiast
+            </button>
+            <button
+              style={styles.enthusiastButton}
+              onClick={handleOpenWineSpectator}
+            >
+              🍷 Wine Spectator
+            </button>
+          </div>
         </div>
 
         {/* Home indicator */}
         <div style={styles.homeIndicatorWrap}>
           <div style={styles.homeIndicator} />
         </div>
+
+        {showOriginal && image && (
+          <div style={styles.originalOverlay}>
+            <img
+              src={image}
+              alt="Original bottle photo"
+              style={styles.originalOverlayImg}
+            />
+            <span style={styles.originalOverlayCaption}>Original photo</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -503,25 +686,25 @@ const styles = {
     border: "1.5px solid #E2CE9F",
     borderRadius: 20,
     background: "linear-gradient(180deg, #FFFDF8 0%, #FBF1DD 100%)",
-    padding: "38px 20px",
+    padding: "24px 20px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: 6,
+    gap: 4,
     cursor: "pointer",
     fontFamily: "inherit",
     boxShadow:
       "0 1px 2px rgba(74,16,32,0.06), inset 0 0 0 1px rgba(255,255,255,0.5)",
   },
   uploadGlyph: {
-    width: 62,
-    height: 62,
+    width: 44,
+    height: 44,
     borderRadius: "50%",
     background: "#FBF5E9",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 8,
+    marginBottom: 5,
     boxShadow: "inset 0 0 0 1.5px #E2CE9F, 0 2px 6px rgba(201,150,46,0.15)",
   },
   uploadTitle: {
@@ -534,7 +717,7 @@ const styles = {
     fontSize: 13,
     color: "#8C7A5A",
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: 6,
   },
   uploadCta: {
     fontSize: 13,
@@ -581,12 +764,38 @@ const styles = {
     whiteSpace: "nowrap",
   },
   photoThumb: {
-    width: 56,
-    height: 84,
+    width: 68,
+    height: 68,
     borderRadius: 12,
     overflow: "hidden",
     background: "#2A1418",
     flexShrink: 0,
+    boxShadow: "0 0 0 1px #D9A93F, 0 4px 10px rgba(74,16,32,0.24)",
+  },
+  photoThumbCol: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 3,
+    flexShrink: 0,
+  },
+  thumbCaption: {
+    fontSize: 9,
+    color: "#B8862A",
+    fontWeight: 600,
+    letterSpacing: 0.2,
+    whiteSpace: "nowrap",
+  },
+  photoThumbButton: {
+    width: 68,
+    height: 68,
+    borderRadius: 12,
+    overflow: "hidden",
+    background: "#2A1418",
+    flexShrink: 0,
+    border: "none",
+    padding: 0,
+    cursor: "pointer",
     boxShadow: "0 0 0 1px #D9A93F, 0 4px 10px rgba(74,16,32,0.24)",
   },
   photo: {
@@ -688,6 +897,63 @@ const styles = {
     fontWeight: 600,
     textAlign: "right",
     maxWidth: "60%",
+  },
+  copiedNotice: {
+    fontSize: 12,
+    color: "#8C7A5A",
+    fontStyle: "italic",
+    textAlign: "center",
+    marginTop: -6,
+    background: "none",
+    border: "none",
+    padding: 0,
+    fontFamily: "inherit",
+    cursor: "pointer",
+    width: "100%",
+  },
+  bottomButtonRow: {
+    display: "flex",
+    gap: 10,
+  },
+  enthusiastButton: {
+    flex: 1,
+    background: "#FFFDF8",
+    border: "1.5px solid #D9A93F",
+    borderRadius: 16,
+    padding: "14px 8px",
+    fontFamily: SERIF,
+    fontSize: 13.5,
+    fontWeight: 700,
+    color: "#4A1020",
+    letterSpacing: 0.2,
+    cursor: "pointer",
+    boxShadow: "0 2px 8px rgba(74,16,32,0.06)",
+  },
+  originalOverlay: {
+    position: "absolute",
+    inset: 0,
+    background: "rgba(20,8,10,0.93)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 14,
+    padding: 28,
+    zIndex: 30,
+  },
+  originalOverlayImg: {
+    maxWidth: "100%",
+    maxHeight: "78%",
+    borderRadius: 16,
+    objectFit: "contain",
+    boxShadow: "0 0 0 1px #D9A93F, 0 16px 34px rgba(0,0,0,0.5)",
+  },
+  originalOverlayCaption: {
+    fontFamily: SERIF,
+    fontSize: 14,
+    fontWeight: 700,
+    color: "#F3D9A4",
+    letterSpacing: 0.3,
   },
   homeIndicatorWrap: {
     display: "flex",

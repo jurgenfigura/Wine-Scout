@@ -808,6 +808,14 @@ export default function App() {
                 >
                   Donate ♥
                 </a>
+                <a
+                  href="https://forms.gle/QGB4QiMYRc58hVhP6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={styles.infoFeedbackButton}
+                >
+                  Feedback
+                </a>
               </div>
             </div>
           </div>
@@ -1275,6 +1283,8 @@ const styles = {
   infoButtonRow: {
     marginTop: 4,
     display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
     gap: 10,
   },
   infoCloseButton: {
@@ -1298,6 +1308,21 @@ const styles = {
     fontSize: 13.5,
     fontWeight: 700,
     color: "#3B0F1F",
+    cursor: "pointer",
+    textDecoration: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  infoFeedbackButton: {
+    background: "transparent",
+    border: "1.5px solid #3B2A20",
+    borderRadius: 12,
+    padding: "9px 22px",
+    fontFamily: "inherit",
+    fontSize: 13.5,
+    fontWeight: 700,
+    color: "#3B2A20",
     cursor: "pointer",
     textDecoration: "none",
     display: "inline-flex",

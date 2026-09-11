@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 function WineGlassIcon({ size = 26, color = "#F3D9A4", strokeWidth = 1.6 }) {
   return (
@@ -752,6 +753,7 @@ export default function App() {
           </div>
         )}
       </div>
+      <Analytics />
     </div>
   );
 }

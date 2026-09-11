@@ -356,14 +356,13 @@ export default function App() {
         }
       }
 
-      // Build the clipboard text from every field (not just brand/product/
-      // year), but drop duplicate words as we go - e.g. if the region
-      // ("Napa Valley") repeats a word already in the product name, or the
-      // country name already appears inside the region, we only want it to
-      // show up once. Comparison is case-insensitive and ignores
-      // punctuation so "Napa," and "napa" still count as the same word;
-      // the original word (with its original casing/punctuation) is kept
-      // the first time it appears.
+      // Build the clipboard text from brand/product/type/year/region (country
+      // is intentionally excluded), dropping duplicate words as we go - e.g.
+      // if the region ("Napa Valley") repeats a word already in the product
+      // name, we only want it to show up once. Comparison is
+      // case-insensitive and ignores punctuation so "Napa," and "napa" still
+      // count as the same word; the original word (with its original
+      // casing/punctuation) is kept the first time it appears.
       //
       // This whole block is wrapped in its own try/catch: it's a nice-to-
       // have (populating the clipboard), not part of reading the label, so
@@ -377,7 +376,6 @@ export default function App() {
           finalType,
           finalYear,
           finalRegion,
-          finalCountry,
         ]
           .filter((v) => v && String(v).toLowerCase() !== "unknown")
           .map((field) =>

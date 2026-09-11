@@ -549,13 +549,13 @@ export default function App() {
                 <ConciergeIcon size={30} color="#3B0F1F" />
               </div>
               <div style={styles.brandTextWrap}>
-                <span style={styles.navTitle}>Proof!</span>
-                <span style={styles.navSubtitle}>Your Liquor Store Concierge</span>
+                <span style={styles.navTitle}>BottleReader</span>
+                <span style={styles.navSubtitle}>Snap.Discover.Decide</span>
               </div>
               <button
                 style={styles.infoButton}
                 onClick={() => setShowInfo(true)}
-                title="About Proof!"
+                title="About BottleReader"
               >
                 i
               </button>
@@ -776,29 +776,39 @@ export default function App() {
         {showInfo && (
           <div style={styles.infoOverlay}>
             <div style={styles.infoCard}>
-              <span style={styles.infoTitle}>About Proof!</span>
+              <span style={styles.infoTitle}>About BottleReader</span>
               <p style={styles.infoBody}>
-                I created this helper app to more quickly browse and research
-                wine and spirits while I'm in the store. I don't know about
-                you, but I find it hard to accurately spell most Italian
-                labels and often got no results. I'm hoping this makes your
-                life easier.
+                I created this helper app to quickly browse and research
+                wine and spirits while I'm in the store. It was taking me too
+                long to type label names into ratings search without a
+                spelling mistake so often got no results. I'm hoping this
+                makes your life easier.
                 <br />
                 <br />
-                If you find this useful please consider a donation towards
-                funding the Claude API that I pay for.
+                If you find this app useful please consider a small donation
+                to help keep it running.
                 <br />
                 <br />
                 Happy Hunting!
                 <br />
                 - Jurgen
               </p>
-              <button
-                style={styles.infoCloseButton}
-                onClick={() => setShowInfo(false)}
-              >
-                Got it
-              </button>
+              <div style={styles.infoButtonRow}>
+                <button
+                  style={styles.infoCloseButton}
+                  onClick={() => setShowInfo(false)}
+                >
+                  Dismiss
+                </button>
+                <a
+                  href="https://paypal.me/HansJurgenF"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={styles.infoDonateButton}
+                >
+                  Donate ♥
+                </a>
+              </div>
             </div>
           </div>
         )}
@@ -1262,8 +1272,12 @@ const styles = {
     textAlign: "center",
     margin: 0,
   },
-  infoCloseButton: {
+  infoButtonRow: {
     marginTop: 4,
+    display: "flex",
+    gap: 10,
+  },
+  infoCloseButton: {
     background: "linear-gradient(135deg, #E8C877 0%, #D9A93F 45%, #B8862A 100%)",
     border: "none",
     borderRadius: 12,
@@ -1274,6 +1288,21 @@ const styles = {
     color: "#3B0F1F",
     cursor: "pointer",
     boxShadow: "0 4px 10px rgba(184,134,42,0.3)",
+  },
+  infoDonateButton: {
+    background: "transparent",
+    border: "1.5px solid #B8862A",
+    borderRadius: 12,
+    padding: "9px 22px",
+    fontFamily: "inherit",
+    fontSize: 13.5,
+    fontWeight: 700,
+    color: "#3B0F1F",
+    cursor: "pointer",
+    textDecoration: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   homeIndicatorWrap: {
     display: "flex",

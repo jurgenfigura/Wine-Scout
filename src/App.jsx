@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import { Analytics } from "@vercel/analytics/react";
 
 function WineGlassIcon({ size = 26, color = "#F3D9A4", strokeWidth = 1.6 }) {
   return (
@@ -357,30 +356,71 @@ export default function App() {
         }
       }
 
-      const newClipboardText = [finalBrand, finalProduct, finalYear]
-        .filter((v) => v && v.toLowerCase() !== "unknown")
-        .join("\n");
+      // Build the clipboard text from every field (not just brand/product/
+      // year), but drop duplicate words as we go - e.g. if the region
+      // ("Napa Valley") repeats a word already in the product name, or the
+      // country name already appears inside the region, we only want it to
+      // show up once. Comparison is case-insensitive and ignores
+      // punctuation so "Napa," and "napa" still count as the same word;
+      // the original word (with its original casing/punctuation) is kept
+      // the first time it appears.
+      //
+      // This whole block is wrapped in its own try/catch: it's a nice-to-
+      // have (populating the clipboard), not part of reading the label, so
+      // a problem here should never turn a successful label read into a
+      // "couldn't read the label" error for the user.
+      try {
+        const seenClipboardWords = new Set();
+        const clipboardLines = [
+          finalBrand,
+          finalProduct,
+          finalType,
+          finalYear,
+          finalRegion,
+          finalCountry,
+        ]
+          .filter((v) => v && String(v).toLowerCase() !== "unknown")
+          .map((field) =>
+            String(field)
+              .split(/\s+/)
+              .filter((word) => {
+                const key = word.toLowerCase().replace(/[^a-z0-9]/g, "");
+                if (!key || seenClipboardWords.has(key)) return false;
+                seenClipboardWords.add(key);
+                return true;
+              })
+              .join(" ")
+          )
+          .filter((line) => line.length > 0);
 
-      if (newClipboardText) {
-        setClipboardText(newClipboardText);
-        setCopied(true);
-        // Best-effort automatic copy. Many browsers only allow clipboard
-        // writes that happen directly inside a click handler, so this can
-        // silently fail here since we're deep inside an async chain. The
-        // notice below is also a button - tapping it retries the copy
-        // from a genuine click, which is far more reliable.
-        try {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(newClipboardText);
-          } else {
-            throw new Error("Clipboard API unavailable");
+        const newClipboardText = clipboardLines.join("\n");
+
+        if (newClipboardText) {
+          setClipboardText(newClipboardText);
+          setCopied(true);
+          // Best-effort automatic copy. Many browsers only allow clipboard
+          // writes that happen directly inside a click handler, so this can
+          // silently fail here since we're deep inside an async chain. The
+          // notice below is also a button - tapping it retries the copy
+          // from a genuine click, which is far more reliable.
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(newClipboardText);
+            } else {
+              throw new Error("Clipboard API unavailable");
+            }
+          } catch (clipErr) {
+            console.error(
+              "Automatic clipboard write failed (expected in some environments - tap the notice to copy manually):",
+              clipErr
+            );
           }
-        } catch (clipErr) {
-          console.error(
-            "Automatic clipboard write failed (expected in some environments - tap the notice to copy manually):",
-            clipErr
-          );
         }
+      } catch (clipboardBuildErr) {
+        console.error(
+          "Building clipboard text failed (label was still read fine):",
+          clipboardBuildErr
+        );
       }
 
       setStatus("done");
@@ -753,7 +793,6 @@ export default function App() {
           </div>
         )}
       </div>
-      <Analytics />
     </div>
   );
 }

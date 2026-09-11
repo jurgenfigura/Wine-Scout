@@ -189,16 +189,28 @@ export default function App() {
   };
 
   const handleOpenGoogleSearch = () => {
-    const query = [
+    // Same approach as the clipboard text: brand/product/type/year/region
+    // (no country), with duplicate words dropped as they're encountered -
+    // case-insensitive and punctuation-insensitive, keeping the first
+    // occurrence's original casing/punctuation.
+    const seenQueryWords = new Set();
+    const queryWords = [
       itemData.brand,
       itemData.product,
       itemData.type,
       itemData.year,
       itemData.region,
-      itemData.country,
     ]
-      .filter((v) => v && v.toLowerCase() !== "unknown")
-      .join(" ");
+      .filter((v) => v && String(v).toLowerCase() !== "unknown")
+      .flatMap((field) => String(field).split(/\s+/))
+      .filter((word) => {
+        const key = word.toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (!key || seenQueryWords.has(key)) return false;
+        seenQueryWords.add(key);
+        return true;
+      });
+
+    const query = queryWords.join(" ");
     const url = query
       ? `https://www.google.com/search?q=${encodeURIComponent(query)}`
       : "https://www.google.com/";

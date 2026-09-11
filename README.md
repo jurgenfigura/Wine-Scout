@@ -1,7 +1,8 @@
 # BottleReader
 
-A mobile-styled web app that lets you photograph a wine or spirit label and uses
-Claude's vision to identify the winery or distiller, product, vintage, region, and country.
+A mobile-styled web app that lets you photograph a wine label and uses
+Claude's vision to identify the winery, wine name, vintage, grape
+varietal(s), region, and country.
 
 This README explains every file in this project and walks through running
 it locally and deploying it to Vercel, assuming no prior web development
@@ -10,7 +11,7 @@ experience.
 ## What's in this folder, and why
 
 ```
-proof/
+bottlereader/
 ├── package.json        the project's "ID card" - name, dependencies, scripts
 ├── vite.config.js       configuration for Vite, the tool that builds the app
 ├── index.html           the one HTML page the browser actually loads
@@ -66,7 +67,7 @@ browser opens first. Ours is almost empty on purpose:
 
 That `<div id="root">` is an empty container. The `<script>` tag loads our
 JavaScript, which then finds that container and fills it with the entire
-Proof interface. This pattern - one mostly-blank HTML file, with
+BottleReader interface. This pattern - one mostly-blank HTML file, with
 JavaScript building everything inside it - is how almost all React apps
 work; it's called a **single-page app**.
 
@@ -88,7 +89,7 @@ and you'll rarely need to touch it again.
 
 ### `src/App.jsx`
 
-This is your actual Proof app - the camera upload button, the
+This is your actual BottleReader app - the camera upload button, the
 burgundy-and-gold styling, the thumbnail, the data sheet, the pinot noir
 easter egg, all of it. It's the same component you were iterating on
 before, with one important change explained below.
@@ -172,7 +173,7 @@ your part.
    ```
    git init
    git add .
-   git commit -m "Proof"
+   git commit -m "BottleReader"
    ```
    Then create a new repository on GitHub and follow its instructions to
    push your code there.
@@ -192,7 +193,7 @@ your part.
    written into your code or repository.
 
 4. **Deploy.** Click "Deploy." Vercel builds the app and gives you a live
-   URL (something like `proof.vercel.app`) that works on any phone or
+   URL (something like `bottlereader.vercel.app`) that works on any phone or
    computer.
 
 From then on, every time you push a new commit to GitHub, Vercel

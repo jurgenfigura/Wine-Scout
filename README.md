@@ -1,4 +1,4 @@
-# Proof
+# BottleReader
 
 A mobile-styled web app that lets you photograph a wine label and uses
 Claude's vision to identify the winery, wine name, vintage, grape
@@ -19,7 +19,7 @@ proof/
 ├── .env.example         a template showing which secret value the app needs
 ├── src/
 │   ├── main.jsx          the entry point: mounts the app onto the page
-│   └── App.jsx           the Proof component itself (your app's UI)
+│   └── App.jsx           the BottleReader component itself (your app's UI)
 └── api/
     └── analyze.js        a small backend function that talks to Anthropic
 ```

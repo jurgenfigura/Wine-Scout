@@ -212,7 +212,7 @@ export default function App() {
 
     const query = queryWords.join(" ");
     const url = query
-      ? `https://www.google.com/search?q=${encodeURIComponent(query)}`
+      ? `https://www.google.com/search?q=${encodeURIComponent(query)}&udm=50`
       : "https://www.google.com/";
     window.open(url, "_blank", "noopener,noreferrer");
   };

@@ -1,8 +1,7 @@
 # BottleReader
 
-A mobile-styled web app that lets you photograph a wine label and uses
-Claude's vision to identify the winery, wine name, vintage, grape
-varietal(s), region, and country.
+A mobile-styled web app that lets you photograph a wine or spirit label and uses
+Claude's vision to identify the winery or distiller, product, vintage, region, and country.
 
 This README explains every file in this project and walks through running
 it locally and deploying it to Vercel, assuming no prior web development
